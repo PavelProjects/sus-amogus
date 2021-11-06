@@ -30,7 +30,7 @@ def upload():
     #   file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'uploaded.jpg'))
     imageConverted.load_img(os.path.join(app.config['UPLOAD_FOLDER'], 'uploaded.jpg'), resize=False)
     imageConverted.convert_img()
-    imageConverted.save_image()
+    imageConverted.save_converted_image()
 
     return redirect("/")
 

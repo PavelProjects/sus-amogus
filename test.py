@@ -1,4 +1,4 @@
 from ImgToSus import ImgToSus
 
-ImgToSus()
+ImgToSus(debug=True)
 input("loaded")
