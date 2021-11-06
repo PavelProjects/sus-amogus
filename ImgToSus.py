@@ -1,10 +1,8 @@
 from re import DEBUG
 import cv2
 import webcolors
-from webcolors import rgb_to_name
+import numpy as np
 
-IMAGE_WIDHT = 400
-IMAGE_HEIGHT = 400
 CONVERTED_PATH = "./static/converted.jpg"
 COLORS_PATH = "./static/amogus.gif"
 COLORS_COUNT = 12
@@ -20,7 +18,7 @@ class ImgToSus:
     # загружает амогус цвета
     # хранится в виде двух словарей:
     # self.colors_img - {ключ картинки: [список изображений]}
-    # self.colors_keys - {название цвета en: ключ цвета}
+    # self.colors_keys - {brg ключ цвета: ключ цвета}
     def __load_colors(self):
         cap = cv2.VideoCapture(COLORS_PATH)
         if not cap.isOpened():
@@ -48,12 +46,13 @@ class ImgToSus:
                     if key not in self.colors_img.keys():
                         self.colors_img.update({key: [current_frame]})
                         b, g, r = current_frame[COLOR_PROB_Y, COLOR_PROB_X]
-                        color = self.__closest_colour((r, g, b))
-                        self.colors_keys.update({color: key})
+                        self.colors_keys.update({(b, g, r): key})
                     else:
                         self.colors_img[key].append(current_frame)
                     j += 1
             
+        self.cell_w = w
+        self.cell_h = height
         if self.debug:
             self.__show_colors()
 
@@ -79,34 +78,49 @@ class ImgToSus:
             min_colours[(rd + gd + bd)] = name
         return min_colours[min(min_colours.keys())]
 
-    # Режет картинку на прямоугольники nxm
-    def image_crop(self, n, m):
-        images = []  
-        width, height, _ = self.img.shape
-
-        for i in range(0, width, width//n):
-            for j in range(0, height, height//m):
-                images.append(self.img[i:i + width//n, j:j + height//m])
-        return images
+    # Поиск цвета для замены клетки 
+    # Возвращает bgr ключ цвета (например (197, 17, 17))
+    def __get_cell_color(self, frame):
+        return (17, 17, 197)
 
     # Загрузка основного изображения для преобразования
-    def load_img(self, path: str, resize: bool = True):
+    def load_img(self, path: str):
         if path == None or path == '':
             raise Exception("IMAGE PATH CAN'T BE EMPTY")
         
         self.img = cv2.imread(path)
-        if resize:
-            self.img = cv2.resize(self.img, (IMAGE_WIDHT, IMAGE_HEIGHT))
+        h, w, _ = self.img.shape
+        ah = h // self.cell_h * self.cell_h
+        aw = w // self.cell_w * self.cell_w
+        self.img = cv2.resize(self.img, (aw, ah))
     
     # Преобразование картинки
     def convert_img(self):
         if self.img.all() == None:
             raise Exception("NO IMAGE LOADED")
-        # self.result[:h, :w, :3] = img
+        print(self.colors_keys)
+
+        height, width, _ = self.img.shape
+        for x in range(0, width, self.cell_w):
+            for y in range(0, height, self.cell_h):
+                # color = self.__get_cell_color(self.img[x:x + self.cell_h, y:y + self.cell_w])
+                # color_key = self.colors_keys[color]
+                # if color_key != None:
+                #     color_img = self.colors_img[color_key]
+                #     try:
+                #         print(self.cell_w)
+                #         print(color_img[0].shape)
+                #         self.img[x:x + self.cell_h, y:y + self.cell_w, :3] = color_img[2]
+                #     except Exception as e:
+                #         print(str(e))
+                cv2.rectangle(self.img, (y,x), (y + self.cell_w, x + self.cell_h), (0, 255, 0))
+
+        cv2.imshow("e", self.img)
+        cv2.waitKey()
     
     # сохранение изменненого изображения
     def save_converted_image(self):
         if self.result.all() == None:
             self.convert_img()
-        cv2.imwrite(CONVERTED_PATH, self.result)
+        cv2.imwrite(CONVERTED_PATH, self.img)
 
