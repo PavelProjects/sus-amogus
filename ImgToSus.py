@@ -37,8 +37,15 @@ class ImgToSus:
         #     except Exception as e:
         #         print(str(e))
 
-    def image_crop(self,image, n):
-        pass
+    def image_crop(self, n):
+        images = []  
+        width, height, _ = img.self.shape
+
+        for i in range(0, width, width//n):
+            for j in range(0, height, height//n):
+                images.append(image[i:i + width//n, j:j + height//n])
+        images = np.array(images) 
+        return images
 
 
 
