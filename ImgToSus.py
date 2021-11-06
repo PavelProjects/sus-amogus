@@ -37,6 +37,11 @@ class ImgToSus:
         #     except Exception as e:
         #         print(str(e))
 
+    def image_crop(self,image, n):
+        pass
+
+
+
     def load_img(self, path: str, resize: bool = True):
         if path == None or path == '':
             raise Exception("IMAGE PATH CAN'T BE EMPTY")
