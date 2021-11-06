@@ -17,6 +17,10 @@ class ImgToSus:
         self.img = None
         self.__load_colors()
 
+    # загружает амогус цвета
+    # хранится в виде двух словарей:
+    # self.colors_img - {ключ картинки: [список изображений]}
+    # self.colors_keys - {название цвета en: ключ цвета}
     def __load_colors(self):
         cap = cv2.VideoCapture(COLORS_PATH)
         if not cap.isOpened():
@@ -53,6 +57,7 @@ class ImgToSus:
         if self.debug:
             self.__show_colors()
 
+    # для дебага, выводит амогусов
     def __show_colors(self):
         print(self.colors_keys)
         for key in self.colors_img.keys():
@@ -63,6 +68,7 @@ class ImgToSus:
             except Exception as e:
                 print(str(e))
 
+    # Вернет название цвета исходя из rgb кода
     def __closest_colour(self, requested_colour):
         min_colours = {}
         for key, name in webcolors.CSS21_HEX_TO_NAMES.items():
@@ -73,21 +79,17 @@ class ImgToSus:
             min_colours[(rd + gd + bd)] = name
         return min_colours[min(min_colours.keys())]
 
-    def image_crop(self, n):
+    # Режет картинку на прямоугольники nxm
+    def image_crop(self, n, m):
         images = []  
         width, height, _ = self.img.shape
 
         for i in range(0, width, width//n):
-            for j in range(0, height, height//n):
-                images.append(self.img[i:i + width//n, j:j + height//n])
+            for j in range(0, height, height//m):
+                images.append(self.img[i:i + width//n, j:j + height//m])
         return images
 
-    def get_color_img(self):
-        return self.colors_img[0]
-
-    def image_crop(self, image, n):
-        pass
-
+    # Загрузка основного изображения для преобразования
     def load_img(self, path: str, resize: bool = True):
         if path == None or path == '':
             raise Exception("IMAGE PATH CAN'T BE EMPTY")
@@ -96,18 +98,13 @@ class ImgToSus:
         if resize:
             self.img = cv2.resize(self.img, (IMAGE_WIDHT, IMAGE_HEIGHT))
     
+    # Преобразование картинки
     def convert_img(self):
         if self.img.all() == None:
             raise Exception("NO IMAGE LOADED")
-        
-        self.result = self.img
-        img = self.get_color_img()
-        h, w = self.cell_size
-        print(f"{self.img.shape} {img.shape}")
-        self.result[:h, :w, :3] = img
-
-        return self.result
+        # self.result[:h, :w, :3] = img
     
+    # сохранение изменненого изображения
     def save_converted_image(self):
         if self.result.all() == None:
             self.convert_img()
