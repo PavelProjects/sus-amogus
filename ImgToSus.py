@@ -73,6 +73,15 @@ class ImgToSus:
             min_colours[(rd + gd + bd)] = name
         return min_colours[min(min_colours.keys())]
 
+    def image_crop(self, n):
+        images = []  
+        width, height, _ = self.img.shape
+
+        for i in range(0, width, width//n):
+            for j in range(0, height, height//n):
+                images.append(self.img[i:i + width//n, j:j + height//n])
+        return images
+
     def get_color_img(self):
         return self.colors_img[0]
 
