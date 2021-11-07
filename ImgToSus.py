@@ -11,16 +11,16 @@ COLOR_PROB_Y = 12
 COLOR_SCALE = 3
 
 class ImgToSus:
-    def __init__(self, debug: bool = False) -> None:
+    def __init__(self, debug: bool = False, scale: int = COLOR_SCALE) -> None:
         self.debug = debug
         self.img = None
-        self.__load_colors()
+        self.__load_colors(scale)
 
     # загружает амогус цвета
     # хранится в виде двух словарей:
     # self.colors_img - {ключ картинки: [список изображений]}
     # self.colors_keys - {brg ключ цвета: ключ цвета}
-    def __load_colors(self):
+    def __load_colors(self, scale: int):
         cap = cv2.VideoCapture(COLORS_PATH)
         if not cap.isOpened():
             raise Exception("CAN'T OPEN SUS COLORS")
@@ -37,6 +37,8 @@ class ImgToSus:
                 height, width, _ = frame.shape
                 w = width//COLORS_COUNT
                 self.cell_size = (height, width//COLORS_COUNT)
+                cell_w = w//scale
+                cell_h = height//scale
 
             j = 0
             for i in range(0, width, width//COLORS_COUNT):
@@ -44,7 +46,7 @@ class ImgToSus:
                 _, l,_ = current_frame.shape
                 if l >= w:
                     key = j % COLORS_COUNT
-                    current_frame_r = cv2.resize(current_frame, (w//COLOR_SCALE, height//COLOR_SCALE))
+                    current_frame_r = cv2.resize(current_frame, (cell_w, cell_h))
                     if key not in self.colors_img.keys():
                         self.colors_img.update({key: [current_frame_r]})
                         b, g, r = current_frame[COLOR_PROB_Y, COLOR_PROB_X]
@@ -53,9 +55,9 @@ class ImgToSus:
                         self.colors_img[key].append(current_frame_r)
                     j += 1
             
-        self.cell_w = w//COLOR_SCALE
-        self.cell_h = height//COLOR_SCALE
-        
+        self.cell_w = cell_w
+        self.cell_h = cell_h
+
         if self.debug:
             self.__show_colors()
 
