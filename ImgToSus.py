@@ -8,6 +8,7 @@ COLORS_PATH = "./static/amogus.gif"
 COLORS_COUNT = 12
 COLOR_PROB_X = 63
 COLOR_PROB_Y = 12
+COLOR_SCALE = 3
 
 class ImgToSus:
     def __init__(self, debug: bool = False) -> None:
@@ -43,16 +44,18 @@ class ImgToSus:
                 _, l,_ = current_frame.shape
                 if l >= w:
                     key = j % COLORS_COUNT
+                    current_frame_r = cv2.resize(current_frame, (w//COLOR_SCALE, height//COLOR_SCALE))
                     if key not in self.colors_img.keys():
-                        self.colors_img.update({key: [current_frame]})
+                        self.colors_img.update({key: [current_frame_r]})
                         b, g, r = current_frame[COLOR_PROB_Y, COLOR_PROB_X]
                         self.colors_keys.update({(b, g, r): key})
                     else:
-                        self.colors_img[key].append(current_frame)
+                        self.colors_img[key].append(current_frame_r)
                     j += 1
             
-        self.cell_w = w
-        self.cell_h = height
+        self.cell_w = w//COLOR_SCALE
+        self.cell_h = height//COLOR_SCALE
+        
         if self.debug:
             self.__show_colors()
 
@@ -107,7 +110,6 @@ class ImgToSus:
                 if color_key != None:
                     color_img = self.colors_img[color_key]
                     try:
-                        print(color_img[2].shape)
                         self.img[y:y + self.cell_h, x:x + self.cell_w, :3] = color_img[2]
                     except Exception as e:
                         print(f"#{y} - {x} | {self.img[y:y + self.cell_h, x:x + self.cell_w, :3].shape} {str(e)}")
