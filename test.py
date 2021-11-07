@@ -1,4 +1,6 @@
 from ImgToSus import ImgToSus
 
-ImgToSus(debug=True)
+conv = ImgToSus(debug=False)
+conv.load_img("./static/pupa.jpg")
+conv.convert_img()
 input("loaded")

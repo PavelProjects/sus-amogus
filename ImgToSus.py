@@ -98,22 +98,19 @@ class ImgToSus:
     def convert_img(self):
         if self.img.all() == None:
             raise Exception("NO IMAGE LOADED")
-        print(self.colors_keys)
 
         height, width, _ = self.img.shape
         for x in range(0, width, self.cell_w):
             for y in range(0, height, self.cell_h):
-                # color = self.__get_cell_color(self.img[x:x + self.cell_h, y:y + self.cell_w])
-                # color_key = self.colors_keys[color]
-                # if color_key != None:
-                #     color_img = self.colors_img[color_key]
-                #     try:
-                #         print(self.cell_w)
-                #         print(color_img[0].shape)
-                #         self.img[x:x + self.cell_h, y:y + self.cell_w, :3] = color_img[2]
-                #     except Exception as e:
-                #         print(str(e))
-                cv2.rectangle(self.img, (y,x), (y + self.cell_w, x + self.cell_h), (0, 255, 0))
+                color = self.__get_cell_color(self.img[x:x + self.cell_h, y:y + self.cell_w])
+                color_key = self.colors_keys[color]
+                if color_key != None:
+                    color_img = self.colors_img[color_key]
+                    try:
+                        print(color_img[2].shape)
+                        self.img[y:y + self.cell_h, x:x + self.cell_w, :3] = color_img[2]
+                    except Exception as e:
+                        print(f"#{y} - {x} | {self.img[y:y + self.cell_h, x:x + self.cell_w, :3].shape} {str(e)}")
 
         cv2.imshow("e", self.img)
         cv2.waitKey()
