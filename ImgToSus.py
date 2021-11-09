@@ -68,7 +68,7 @@ class ImgToSus:
             min_colours[(rd + gd + bd)] = self.colors_keys[(b_c, g_c, r_c)]
         return min_colours[min(min_colours.keys())]
 
-    #TODO
+    #TODO ВЕРА перепиши этот метод, в frame приходит каритинка, для нее найти цвет
     # Поиск цвета для замены клетки 
     # Возвращает bgr ключ цвета (например (197, 17, 17))
     def __get_cell_color(self, frame):
