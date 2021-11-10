@@ -1,7 +1,9 @@
+from cv2 import FlannBasedMatcher
 from ImgToSus import ImgToSus
+import time
+start_time = time.time()
 
-conv = ImgToSus(debug=False, scale=6)
-conv.load_img("./static/test.jpg")
-conv.convert_img()
-conv.save_converted_image()
-input("loaded")
+conv = ImgToSus(debug=False, scale=7)
+conv.load_img("./static/test.jpg", increase_contrast=True)
+print(conv.convert_img())
+print("--- %s seconds ---" % (time.time() - start_time))
