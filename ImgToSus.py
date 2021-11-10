@@ -58,14 +58,40 @@ class ImgToSus:
         self.cell_w = cell_w
         self.cell_h = cell_h
 
+    def __increase_contrast(self, img):
+        lab= cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+        l, a, b = cv2.split(lab)
+        clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8,8))
+        cl = clahe.apply(l)
+        limg = cv2.merge((cl,a,b))
+        return cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
+
     # Вернет подходящий sus цвет
     def __get_sus_color(self, requested_colour):
         min_colours = {}
+        # эту жесть надо переделать, но я хз пока как лучше
         for b_c, g_c, r_c in self.colors_keys.keys():
-            rd = (r_c - requested_colour[0]) ** 2
-            gd = (g_c - requested_colour[1]) ** 2
-            bd = (b_c - requested_colour[2]) ** 2
+            if r_c > requested_colour[2]:
+                rd = (r_c - requested_colour[2]) ** 2
+            else:
+                rd = (requested_colour[2] - r_c) ** 2
+
+            if g_c > requested_colour[1]:
+                gd = (g_c - requested_colour[1]) ** 2
+            else:
+                gd = (requested_colour[1] - g_c) ** 2
+            
+            if b_c > requested_colour[0]:
+                bd = (b_c - requested_colour[0]) ** 2
+            else:
+                bd = (requested_colour[0] - b_c) ** 2
+
             min_colours[(rd + gd + bd)] = self.colors_keys[(b_c, g_c, r_c)]
+        
+        # if requested_colour[1] == 255:
+        #     print(requested_colour)
+        #     print(min_colours)
+        #     print(min(min_colours.keys()))
         return min_colours[min(min_colours.keys())]
 
     #TODO ВЕРА перепиши этот метод, в frame приходит каритинка, для нее найти цвет
@@ -75,19 +101,22 @@ class ImgToSus:
         h, w, _ = frame.shape
         # if h <= 2 or w <= 2:
         #     return (0,0,0)
-        print((h, w))
         return frame[h//2, w//2]
 
     # Загрузка основного изображения для преобразования
-    def load_img(self, path: str):
+    def load_img(self, path: str, increase_contrast: bool = True):
         if path == None or path == '':
             raise Exception("IMAGE PATH CAN'T BE EMPTY")
         
-        self.img = cv2.imread(path)
-        h, w, _ = self.img.shape
+        img = cv2.imread(path)
+        h, w, _ = img.shape
         ah = h // self.cell_h * self.cell_h
         aw = w // self.cell_w * self.cell_w
-        self.img = cv2.resize(self.img, (aw, ah))
+        img = cv2.resize(img, (aw, ah))
+        if increase_contrast:
+            img = self.__increase_contrast(img)
+        print(self.colors_keys)
+        self.img = img
     
     # Преобразование картинки
     def convert_img(self):
@@ -97,11 +126,8 @@ class ImgToSus:
         height, width, _ = self.img.shape
         for y in range(0, height, self.cell_h):
             for x in range(0, width, self.cell_w):
-                print((y, y + self.cell_w))
-                print((height, width))
                 color = self.__get_cell_color(self.img[y:y + self.cell_h, x:x + self.cell_w])
                 color_key = self.__get_sus_color(color)
-                print((color, color_key))
                 if color_key != None:
                     color_img = self.colors_img[color_key]
                     self.img[y:y + self.cell_h, x:x + self.cell_w, :3] = color_img[2]
