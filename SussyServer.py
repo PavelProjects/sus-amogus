@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 HOME_PATH = app.root_path
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg'}
-UPLOAD_FOLDER = HOME_PATH + '/temporary/'
+UPLOAD_FOLDER = 'temporary/'
 FILENAME_TEMPLATE = "$name_$key.$ext"
 
 def allowed_file(filename):
@@ -16,8 +16,10 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route("/", methods=['GET'])
-def main():
-    return render_template("suspage.html", images=sorted(os.listdir(UPLOAD_FOLDER)[::-1]))
+def main(): 
+    converted = request.args.get('converted')
+    uploaded = request.args.get('uploaded')
+    return render_template("suspage.html", folder=app.config['UPLOAD_FOLDER'], converted=converted, uploaded=uploaded)
 
 @app.route("/upload", methods=['POST'])
 def upload():
@@ -30,24 +32,24 @@ def upload():
             flash('No file selected')
 
         if file and allowed_file(file.filename):
-            filename = get_correct_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            imageConverted = ImgToSus(scale=7)
-            imageConverted.load_img(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            uploaded_filename = get_correct_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], uploaded_filename))
+            imageConverted = ImgToSus(scale=5)
+            imageConverted.load_img(os.path.join(app.config['UPLOAD_FOLDER'], uploaded_filename))
             result_path = imageConverted.convert_img()
-            remove_file(filename)
+            remove_file(uploaded_filename)
 
-            return redirect(f"/temporary/{result_path}")
-        return flash("Wrong file format! Need jpg or jpeg")
+            return redirect(f"/?converted={result_path}&uploaded={uploaded_filename}")
+        flash("Wrong file format! Need jpg or jpeg")
+        return redirect("/")
     except Exception as e:
         return str(e)
 
 @app.route('/temporary/<filename>', methods=['GET', 'POST'])
 def download(filename):
     try:
-        temp = os.path.join(app.root_path, app.config['UPLOAD_FOLDER'])
-        result = send_file(temp + filename, attachment_filename=filename)
-        remove_file(temp + filename)
+        result = send_file(app.config['UPLOAD_FOLDER'] + filename, attachment_filename=filename)
+        remove_file(app.config['UPLOAD_FOLDER'] + filename)
         return result
     except Exception as e:
         return str(e)
@@ -61,7 +63,7 @@ def remove_file(filename):
     if "/" in filename or "." in filename:
         os.system(f"rm {filename}")
     else:
-        os.system(f"rm {UPLOAD_FOLDER + filename}")
+        os.system(f"rm {app.root_path + UPLOAD_FOLDER + filename}")
 
 if __name__ == '__main__':
     app.secret_key = 'super secret key'

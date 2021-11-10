@@ -5,18 +5,16 @@
         <input type=file name=file>
         <input type=submit value=convert!>
     </form>
-    {% if images %}
-    {% for path in images %}
-        {% if 'uploaded.jpg' in path %} 
-        <div>
-            <img src="{{ url_for('static', filename='uploaded.jpg') }}" width="400" height="400" >
-        </div>
+    {% if folder %} 
+        {% if uploaded %}
+            <div>
+                <img src="{{ url_for(folder, filename=uploaded) }}" width="400" height="400" >
+            </div>
         {% endif %}
-        {% if 'converted.gif' in path %} 
-        <div>
-            <img src="{{ url_for('static', filename='converted.gif') }}" width="400" height="400">
-        </div>
+        {% if converted %} 
+            <div>
+                <img src="{{ url_for(folder, filename=converted) }}" width="400" height="400">
+            </div>
         {% endif %}
-    {% endfor %}
     {% endif %}
 {% endblock %}
