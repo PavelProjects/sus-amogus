@@ -1,5 +1,7 @@
 import cv2
 import imageio
+from PIL import Image
+import numpy as np
 
 CONVERTED_PATH = "./static/converted.gif"
 COLORS_PATH = "./static/amogus.gif"
@@ -95,11 +97,11 @@ class ImgToSus:
     #TODO ВЕРА перепиши этот метод, в frame приходит каритинка, для нее найти цвет
     # Поиск цвета для замены клетки 
     # Возвращает bgr ключ цвета (например (197, 17, 17))
-    def __get_cell_color(self, frame):
-        h, w, _ = frame.shape
-        # if h <= 2 or w <= 2:
-        #     return (0,0,0)
-        return frame[h//2, w//2]
+    def __get_cell_color(self, frame):  
+
+        img = cv2.resize(frame, (1, 1))
+        b,r,g = img.astype(int)[0][0]   
+        return(b,g,r)
 
     # Загрузка основного изображения для преобразования
     def load_img(self, path: str, increase_contrast: bool = True):
