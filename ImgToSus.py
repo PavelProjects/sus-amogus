@@ -1,9 +1,7 @@
-from re import DEBUG
 import cv2
-import webcolors
-import numpy as np
+import imageio
 
-CONVERTED_PATH = "./static/converted.jpg"
+CONVERTED_PATH = "./static/converted.gif"
 COLORS_PATH = "./static/amogus.gif"
 COLORS_COUNT = 12
 COLOR_PROB_X = 63
@@ -109,19 +107,31 @@ class ImgToSus:
             raise Exception("IMAGE PATH CAN'T BE EMPTY")
         
         img = cv2.imread(path)
+        if img.all() == None:
+            raise Exception(f"Image with path {path} not found!")
+
+        print("Found image")
         h, w, _ = img.shape
         ah = h // self.cell_h * self.cell_h
         aw = w // self.cell_w * self.cell_w
         img = cv2.resize(img, (aw, ah))
         if increase_contrast:
             img = self.__increase_contrast(img)
-        print(self.colors_keys)
+            print("Contrast increased")
         self.img = img
+        print("Image loaded")
     
     # Преобразование картинки
-    def convert_img(self):
+    def convert_img(self, gif_speed: float = 0.05) -> str:
         if self.img.all() == None:
             raise Exception("NO IMAGE LOADED")
+
+        print("Start converting image!")
+        print("Generating frames...")
+
+        frames = []
+        for i in range(len(self.colors_img[0])):
+            frames.append(self.img.copy())
 
         height, width, _ = self.img.shape
         for y in range(0, height, self.cell_h):
@@ -130,12 +140,17 @@ class ImgToSus:
                 color_key = self.__get_sus_color(color)
                 if color_key != None:
                     color_img = self.colors_img[color_key]
-                    self.img[y:y + self.cell_h, x:x + self.cell_w, :3] = color_img[2]
 
-        # cv2.imshow("e", self.img)
-        # cv2.waitKey()
+                    for i in range(len(color_img)):
+                        frames[i][y:y + self.cell_h, x:x + self.cell_w, :3] = color_img[i]
+
+        print("Frames generated")
+        print("Generating gif...")
+
+        result_path = CONVERTED_PATH
+        with imageio.get_writer(result_path, mode="I", duration=gif_speed) as writer:
+            for frame in frames:
+                writer.append_data(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
     
-    # сохранение изменненого изображения
-    def save_converted_image(self):
-        cv2.imwrite(CONVERTED_PATH, self.img)
-
+        print("Gif generated! Done.")
+        return result_path
