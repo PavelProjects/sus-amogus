@@ -1,7 +1,7 @@
 import cv2
 import imageio
-from PIL import Image
-import numpy as np
+
+
 
 CONVERTED_PATH = "./static/converted.gif"
 COLORS_PATH = "./static/amogus.gif"
