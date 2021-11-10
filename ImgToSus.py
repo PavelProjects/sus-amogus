@@ -143,7 +143,7 @@ class ImgToSus:
         print("Frames generated")
         print("Generating gif...")
 
-        result_filename = CONVERTED_FILENAME_TEMPLATE
+        result_filename = CONVERTED_FILENAME_TEMPLATE.replace("$key", "remove_me_lateer")
         with imageio.get_writer(CONVERTED_PATH + result_filename, mode="I", duration=gif_speed) as writer:
             for frame in frames:
                 writer.append_data(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
