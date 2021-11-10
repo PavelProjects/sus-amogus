@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
     <h1>sussy baka</h1>
-    <img src="{{ url_for('static', filename='amogus.gif') }}" >
     <form method=post enctype=multipart/form-data action=upload>
         <input type=file name=file>
         <input type=submit value=convert!>
@@ -13,9 +12,9 @@
             <img src="{{ url_for('static', filename='uploaded.jpg') }}" width="400" height="400" >
         </div>
         {% endif %}
-        {% if 'converted.jpg' in path %} 
+        {% if 'converted.gif' in path %} 
         <div>
-            <img src="{{ url_for('static', filename='converted.jpg') }}" width="400" height="400">
+            <img src="{{ url_for('static', filename='converted.gif') }}" width="400" height="400">
         </div>
         {% endif %}
     {% endfor %}

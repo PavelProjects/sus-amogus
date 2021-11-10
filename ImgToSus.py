@@ -1,8 +1,11 @@
 import cv2
 import imageio
+import os
 
-CONVERTED_PATH = "./static/converted.gif"
-COLORS_PATH = "./static/amogus.gif"
+HOME_PATH = os.path.abspath(os.getcwd())
+CONVERTED_PATH = HOME_PATH + "/temporary/"
+CONVERTED_FILENAME_TEMPLATE = "converted_$key.gif"
+COLORS_PATH = HOME_PATH + "/converter_files/amogus.gif"
 COLORS_COUNT = 12
 COLOR_PROB_X = 63
 COLOR_PROB_Y = 12
@@ -102,14 +105,11 @@ class ImgToSus:
         return frame[h//2, w//2]
 
     # Загрузка основного изображения для преобразования
-    def load_img(self, path: str, increase_contrast: bool = True):
+    def load_img(self, path: str = None, increase_contrast: bool = True):
         if path == None or path == '':
             raise Exception("IMAGE PATH CAN'T BE EMPTY")
         
         img = cv2.imread(path)
-        if img.all() == None:
-            raise Exception(f"Image with path {path} not found!")
-
         print("Found image")
         h, w, _ = img.shape
         ah = h // self.cell_h * self.cell_h
@@ -147,10 +147,10 @@ class ImgToSus:
         print("Frames generated")
         print("Generating gif...")
 
-        result_path = CONVERTED_PATH
-        with imageio.get_writer(result_path, mode="I", duration=gif_speed) as writer:
+        result_filename = CONVERTED_FILENAME_TEMPLATE
+        with imageio.get_writer(CONVERTED_PATH + result_filename, mode="I", duration=gif_speed) as writer:
             for frame in frames:
                 writer.append_data(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
     
         print("Gif generated! Done.")
-        return result_path
+        return result_filename
