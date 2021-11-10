@@ -2,7 +2,7 @@ import cv2
 import imageio
 import os
 
-HOME_PATH = os.path.abspath(os.getcwd())
+HOME_PATH = os.path.abspath(__file__)
 CONVERTED_PATH = HOME_PATH + "/temporary/"
 CONVERTED_FILENAME_TEMPLATE = "converted_$key.gif"
 COLORS_PATH = HOME_PATH + "/converter_files/amogus.gif"
