@@ -2,7 +2,6 @@ import cv2
 import imageio
 
 
-
 CONVERTED_PATH = "./static/converted.gif"
 COLORS_PATH = "./static/amogus.gif"
 COLORS_COUNT = 12
@@ -94,11 +93,7 @@ class ImgToSus:
         #     print(min(min_colours.keys()))
         return min_colours[min(min_colours.keys())]
 
-    #TODO ВЕРА перепиши этот метод, в frame приходит каритинка, для нее найти цвет
-    # Поиск цвета для замены клетки 
-    # Возвращает bgr ключ цвета (например (197, 17, 17))
     def __get_cell_color(self, frame):  
-
         img = cv2.resize(frame, (1, 1))
         b,r,g = img.astype(int)[0][0]   
         return(b,g,r)
