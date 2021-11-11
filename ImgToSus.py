@@ -2,29 +2,29 @@ import cv2
 import imageio
 import os
 
-HOME_PATH = os.path.abspath(__file__)
-CONVERTED_PATH = HOME_PATH + "/temporary/"
+HOME_PATH = os.getcwd()
+CONVERTED_PATH = os.path.join(HOME_PATH, "/temporary/")
 CONVERTED_FILENAME_TEMPLATE = "converted_$key.gif"
-COLORS_PATH = HOME_PATH + "/converter_files/amogus.gif"
+COLORS_PATH = os.path.join(HOME_PATH, "/converter_files/amogus.gif")
 COLORS_COUNT = 12
 COLOR_PROB_X = 63
 COLOR_PROB_Y = 12
 COLOR_SCALE = 3
 
 class ImgToSus:
-    def __init__(self, debug: bool = False, scale: int = COLOR_SCALE) -> None:
+    def __init__(self, debug: bool = False, scale: int = COLOR_SCALE, root: str = COLORS_PATH) -> None:
         self.debug = debug
         self.img = None
-        self.__load_colors(scale)
+        self.__load_colors(scale, path=color_path)
 
     # загружает амогус цвета
     # хранится в виде двух словарей:
     # self.colors_img - {ключ картинки: [список изображений]}
     # self.colors_keys - {brg ключ цвета: ключ цвета}
-    def __load_colors(self, scale: int):
-        cap = cv2.VideoCapture(COLORS_PATH)
+    def __load_colors(self, scale: int, path: str = COLORS_PATH):
+        cap = cv2.VideoCapture(path)
         if not cap.isOpened():
-            raise Exception("CAN'T OPEN SUS COLORS")
+            raise Exception(f"CAN'T FIND SUS COLORS AT {path}")
 
         self.colors_img = {}
         self.colors_keys = {}
@@ -33,7 +33,7 @@ class ImgToSus:
             ret, frame = cap.read()
             if not ret:
                 break
-            
+
             if width == 0 or height == 0:
                 height, width, _ = frame.shape
                 w = width//COLORS_COUNT
@@ -55,7 +55,7 @@ class ImgToSus:
                     else:
                         self.colors_img[key].append(current_frame_r)
                     j += 1
-            
+
         self.cell_w = cell_w
         self.cell_h = cell_h
 
@@ -81,30 +81,30 @@ class ImgToSus:
                 gd = (g_c - requested_colour[1]) ** 2
             else:
                 gd = (requested_colour[1] - g_c) ** 2
-            
+
             if b_c > requested_colour[0]:
                 bd = (b_c - requested_colour[0]) ** 2
             else:
                 bd = (requested_colour[0] - b_c) ** 2
 
             min_colours[(rd + gd + bd)] = self.colors_keys[(b_c, g_c, r_c)]
-        
+
         # if requested_colour[1] == 255:
         #     print(requested_colour)
         #     print(min_colours)
         #     print(min(min_colours.keys()))
         return min_colours[min(min_colours.keys())]
 
-    def __get_cell_color(self, frame):  
+    def __get_cell_color(self, frame):
         img = cv2.resize(frame, (1, 1))
-        b,r,g = img.astype(int)[0][0]   
+        b,r,g = img.astype(int)[0][0]
         return(b,g,r)
 
     # Загрузка основного изображения для преобразования
     def load_img(self, path: str = None, increase_contrast: bool = True):
         if path == None or path == '':
             raise Exception("IMAGE PATH CAN'T BE EMPTY")
-        
+
         img = cv2.imread(path)
         print("Found image")
         h, w, _ = img.shape
@@ -116,7 +116,7 @@ class ImgToSus:
             print("Contrast increased")
         self.img = img
         print("Image loaded")
-    
+
     # Преобразование картинки
     def convert_img(self, gif_speed: float = 0.05) -> str:
         if self.img.all() == None:
@@ -147,6 +147,6 @@ class ImgToSus:
         with imageio.get_writer(CONVERTED_PATH + result_filename, mode="I", duration=gif_speed) as writer:
             for frame in frames:
                 writer.append_data(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-    
+
         print("Gif generated! Done.")
         return result_filename
