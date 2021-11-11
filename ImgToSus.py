@@ -3,25 +3,27 @@ import imageio
 import os
 
 HOME_PATH = os.getcwd()
-CONVERTED_PATH = os.path.join(HOME_PATH, "/temporary/")
+CONVERTED_DIR = "temporary"
 CONVERTED_FILENAME_TEMPLATE = "converted_$key.gif"
-COLORS_PATH = os.path.join(HOME_PATH, "/converter_files/amogus.gif")
+COLORS_PATH = "converter_files/amogus.gif"
 COLORS_COUNT = 12
 COLOR_PROB_X = 63
 COLOR_PROB_Y = 12
 COLOR_SCALE = 3
 
 class ImgToSus:
-    def __init__(self, debug: bool = False, scale: int = COLOR_SCALE, root: str = COLORS_PATH) -> None:
+    def __init__(self, debug: bool = False, scale: int = COLOR_SCALE, root: str = HOME_PATH) -> None:
         self.debug = debug
         self.img = None
-        self.__load_colors(scale, path=color_path)
+        self.root_path = root
+        self.__load_colors(scale, root=root)
 
     # загружает амогус цвета
     # хранится в виде двух словарей:
     # self.colors_img - {ключ картинки: [список изображений]}
     # self.colors_keys - {brg ключ цвета: ключ цвета}
-    def __load_colors(self, scale: int, path: str = COLORS_PATH):
+    def __load_colors(self, scale: int, root: str = HOME_PATH):
+        path = os.path.join(root, COLORS_PATH)
         cap = cv2.VideoCapture(path)
         if not cap.isOpened():
             raise Exception(f"CAN'T FIND SUS COLORS AT {path}")
@@ -144,7 +146,7 @@ class ImgToSus:
         print("Generating gif...")
 
         result_filename = CONVERTED_FILENAME_TEMPLATE.replace("$key", "remove_me_lateer")
-        with imageio.get_writer(CONVERTED_PATH + result_filename, mode="I", duration=gif_speed) as writer:
+        with imageio.get_writer( os.path.join(self.root_path, CONVERTED_DIR, result_filename), mode="I", duration=gif_speed) as writer:
             for frame in frames:
                 writer.append_data(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
 

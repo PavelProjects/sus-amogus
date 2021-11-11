@@ -31,12 +31,13 @@ def upload():
         flash('No file selected')
 
     if file and allowed_file(file.filename):
+        converted_filename = None
         uploaded_filename = get_correct_filename(file.filename)
         path = os.path.join(app.root_path, UPLOAD_FOLDER, uploaded_filename)
         print(f"Saving image {path}")
         file.save(path)
         try:
-            imageConverted = ImgToSus(scale=5, color_path=app.root)
+            imageConverted = ImgToSus(scale=5, root=app.root_path)
             imageConverted.load_img(path)
             converted_filename = imageConverted.convert_img()
             return redirect(f"/?converted={converted_filename}&uploaded={uploaded_filename}")
