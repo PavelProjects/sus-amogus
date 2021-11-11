@@ -41,13 +41,13 @@ def upload():
             imageConverted.load_img(path)
             converted_filename = imageConverted.convert_img()
             result = redirect(f"/?converted={converted_filename}&uploaded={uploaded_filename}")
-            remove_file(uploaded_filename)
-            remove_file(converted_filename)
+            remove_file(path)
+            remove_file(os.path.join(app.root_path, UPLOAD_FOLDER, converted_filename))
             return result
         except:
-            remove_file(uploaded_filename)
+            remove_file(path)
             if converted_filename != None:
-                remove_file(converted_filename)
+                remove_file(os.path.join(app.root_path, UPLOAD_FOLDER, converted_filename))
     flash("Wrong file format! Need jpg or jpeg")
     return redirect("/")
 
@@ -62,11 +62,7 @@ def get_correct_filename(filename):
     return FILENAME_TEMPLATE.replace("$ext", name_ext[1].lower()).replace("$name", name_ext[0]).replace("$key", name_ext[0])
 
 def remove_file(filename):
-    print(filename)
-    if "/" in filename or "." in filename:
-        os.system(f"rm {filename}")
-    else:
-        os.system(f"rm {app.root_path + UPLOAD_FOLDER}/{filename}")
+    os.system(f"rm {filename}")
 
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0')
