@@ -19,7 +19,11 @@ def allowed_file(filename):
 def main():
     converted = request.args.get('converted')
     uploaded = request.args.get('uploaded')
-    return render_template("suspage.html", converted=converted, uploaded=uploaded)
+    result = render_template("suspage.html", converted=converted, uploaded=uploaded)
+    remove_file(os.path.join(app.root_path, UPLOAD_FOLDER, uploaded))
+    remove_file(os.path.join(app.root_path, UPLOAD_FOLDER, converted))
+    return result
+
 
 @app.route("/upload", methods=['POST'])
 def upload():
@@ -40,10 +44,7 @@ def upload():
             imageConverted = ImgToSus(scale=5, root=app.root_path)
             imageConverted.load_img(path)
             converted_filename = imageConverted.convert_img()
-            result = redirect(f"/?converted={converted_filename}&uploaded={uploaded_filename}")
-            remove_file(path)
-            remove_file(os.path.join(app.root_path, UPLOAD_FOLDER, converted_filename))
-            return result
+            return redirect(f"/?converted={converted_filename}&uploaded={uploaded_filename}")
         except:
             remove_file(path)
             if converted_filename != None:
@@ -57,7 +58,8 @@ def download(filename):
     print(folder + filename)
     return send_from_directory(folder, filename)
 
-def get_correct_filename(filename):
+def get_correct_filename(filename: str):
+    filename = filename.replace("/", "\/")
     name_ext = filename.rsplit('.', 1)
     return FILENAME_TEMPLATE.replace("$ext", name_ext[1].lower()).replace("$name", name_ext[0]).replace("$key", name_ext[0])
 
