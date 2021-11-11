@@ -19,11 +19,7 @@ def allowed_file(filename):
 def main():
     converted = request.args.get('converted')
     uploaded = request.args.get('uploaded')
-    result = render_template("suspage.html", converted=converted, uploaded=uploaded)
-    remove_file(os.path.join(app.root_path, UPLOAD_FOLDER, uploaded))
-    remove_file(os.path.join(app.root_path, UPLOAD_FOLDER, converted))
-    return result
-
+    return render_template("suspage.html", converted=converted, uploaded=uploaded)
 
 @app.route("/upload", methods=['POST'])
 def upload():
