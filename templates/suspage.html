@@ -1,18 +1,27 @@
 {% extends "layout.html" %}
 {% block content %}
-    <h1>sussy baka</h1>
-    <form method=post enctype=multipart/form-data action=upload>
-        <input type=file name=file>
-        <input type=submit value=convert!>
-    </form>
-    {% if uploaded %}
-        <div>
-            <img src="{{ url_for('download', filename=uploaded) }}" width="400" height="400" >
+    <center>
+        <div background-image=>
+            <h1>Sus converter</h1>
+            <div class="bckgr">
+                <p>Version {{ version}}</p>
+                <p>Created by iamverk and poeblo (but why?)</p>
+                <p>To generate some shit upload image  (jpg or jpeg) and press convert</p>
+            </div>
+            <form method=post enctype=multipart/form-data action=upload class="bckgr">
+                <input type=file name=file>
+                <input type=submit value=convert!>
+            </form>
+            {% if uploaded %}
+                <div>
+                    <img src="{{ url_for('download', filename=uploaded) }}" width="400" height="400" >
+                </div>
+            {% endif %}
+            {% if converted %} 
+                <div>
+                    <img src="{{ url_for('download', filename=converted) }}" width="400" height="400">
+                </div>
+            {% endif %}
         </div>
-    {% endif %}
-    {% if converted %} 
-        <div>
-            <img src="{{ url_for('download', filename=converted) }}" width="400" height="400">
-        </div>
-    {% endif %}
+    </center>
 {% endblock %}

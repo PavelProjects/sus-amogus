@@ -1,6 +1,12 @@
 <html>
     <head>
         <title>A M O G U S</title>
+        <style>
+            body {
+             background-image: url("{{ url_for('static', filename='background.jpg') }}"); 
+             background-color: #4a678d; 
+            }
+           </style>
     </head>
     {% with messages = get_flashed_messages() %}
     {% if messages %}

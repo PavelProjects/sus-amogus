@@ -4,6 +4,8 @@ import os
 from ImgToSus import ImgToSus
 import uuid
 
+VERSION = "1.0"
+
 app = Flask(__name__)
 
 HOME_PATH = app.root_path
@@ -19,7 +21,7 @@ def allowed_file(filename):
 def main(): 
     converted = request.args.get('converted')
     uploaded = request.args.get('uploaded')
-    return render_template("suspage.html", folder=app.config['UPLOAD_FOLDER'], converted=converted, uploaded=uploaded)
+    return render_template("suspage.html", version=VERSION, folder=app.config['UPLOAD_FOLDER'], converted=converted, uploaded=uploaded)
 
 @app.route("/upload", methods=['POST'])
 def upload():
