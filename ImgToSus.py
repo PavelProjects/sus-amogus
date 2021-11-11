@@ -2,29 +2,31 @@ import cv2
 import imageio
 import os
 
-HOME_PATH = os.path.abspath(os.getcwd())
-CONVERTED_PATH = HOME_PATH + "/temporary/"
-CONVERTED_FILENAME_TEMPLATE = "converted_$key.gif"
-COLORS_PATH = HOME_PATH + "/converter_files/amogus.gif"
+HOME_PATH = os.getcwd()
+CONVERTED_DIR = "temporary"
+CONVERTED_FILENAME_TEMPLATE = "$key.gif"
+COLORS_PATH = "converter_files/amogus.gif"
 COLORS_COUNT = 12
 COLOR_PROB_X = 63
 COLOR_PROB_Y = 12
 COLOR_SCALE = 3
 
 class ImgToSus:
-    def __init__(self, debug: bool = False, scale: int = COLOR_SCALE) -> None:
+    def __init__(self, debug: bool = False, scale: int = COLOR_SCALE, root: str = HOME_PATH) -> None:
         self.debug = debug
         self.img = None
-        self.__load_colors(scale)
+        self.root_path = root
+        self.__load_colors(scale, root=root)
 
     # загружает амогус цвета
     # хранится в виде двух словарей:
     # self.colors_img - {ключ картинки: [список изображений]}
     # self.colors_keys - {brg ключ цвета: ключ цвета}
-    def __load_colors(self, scale: int):
-        cap = cv2.VideoCapture(COLORS_PATH)
+    def __load_colors(self, scale: int, root: str = HOME_PATH):
+        path = os.path.join(root, COLORS_PATH)
+        cap = cv2.VideoCapture(path)
         if not cap.isOpened():
-            raise Exception("CAN'T OPEN SUS COLORS")
+            raise Exception(f"CAN'T FIND SUS COLORS AT {path}")
 
         self.colors_img = {}
         self.colors_keys = {}
@@ -118,7 +120,7 @@ class ImgToSus:
         print("Image loaded")
     
     # Преобразование картинки
-    def convert_img(self, gif_speed: float = 0.05) -> str:
+    def convert_img(self, gif_speed: float = 0.05, key: str = "key") -> str:
         if self.img.all() == None:
             raise Exception("NO IMAGE LOADED")
 
@@ -143,8 +145,8 @@ class ImgToSus:
         print("Frames generated")
         print("Generating gif...")
 
-        result_filename = CONVERTED_FILENAME_TEMPLATE
-        with imageio.get_writer(CONVERTED_PATH + result_filename, mode="I", duration=gif_speed) as writer:
+        result_filename = CONVERTED_FILENAME_TEMPLATE.replace("$key", key)
+        with imageio.get_writer( os.path.join(self.root_path, CONVERTED_DIR, result_filename), mode="I", duration=gif_speed) as writer:
             for frame in frames:
                 writer.append_data(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
     
