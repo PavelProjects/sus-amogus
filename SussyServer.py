@@ -40,9 +40,11 @@ def upload():
             imageConverted = ImgToSus(scale=5, root=app.root_path)
             imageConverted.load_img(path)
             converted_filename = imageConverted.convert_img()
-            return redirect(f"/?converted={converted_filename}&uploaded={uploaded_filename}")
-
-        finally:
+            result = redirect(f"/?converted={converted_filename}&uploaded={uploaded_filename}")
+            remove_file(uploaded_filename)
+            remove_file(converted_filename)
+            return result
+        except:
             remove_file(uploaded_filename)
             if converted_filename != None:
                 remove_file(converted_filename)
