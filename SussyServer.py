@@ -21,7 +21,7 @@ def allowed_file(filename):
 def main(): 
     converted = request.args.get('converted')
     uploaded = request.args.get('uploaded')
-    return render_template("suspage.html", version=VERSION, folder=app.config['UPLOAD_FOLDER'], converted=converted, uploaded=uploaded)
+    return render_template("suspage.html", version=VERSION, folder=UPLOAD_FOLDER, converted=converted, uploaded=uploaded)
 
 @app.route("/upload", methods=['POST'])
 def upload():
@@ -73,5 +73,4 @@ def remove_file(filename):
 if __name__ == '__main__':
     app.secret_key = 'super secret key'
     app.config['SESSION_TYPE'] = 'filesystem'
-    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER   
     app.run(debug=False, host='0.0.0.0')
