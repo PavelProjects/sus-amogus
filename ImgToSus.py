@@ -99,8 +99,8 @@ class ImgToSus:
 
     def __get_cell_color(self, frame):  
         img = cv2.resize(frame, (1, 1))
-        b,r,g = img.astype(int)[0][0]   
-        return(b,g,r)
+        b,g,r = img.astype(int)[0][0]
+        return (b,g,r)
 
     # Загрузка основного изображения для преобразования
     def load_img(self, path: str = None, increase_contrast: bool = True):
@@ -152,3 +152,9 @@ class ImgToSus:
     
         print("Gif generated! Done.")
         return result_filename
+
+
+if __name__ == '__main__':
+    conv = ImgToSus(debug=True)
+    conv.load_img("/home/pavel/Pictures/rgb.jpg")
+    conv.convert_img()
