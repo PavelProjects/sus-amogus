@@ -34,7 +34,7 @@ def upload():
         converted_filename = None
         uploaded_filename = get_correct_filename(file.filename)
         path = os.path.join(app.root_path, UPLOAD_FOLDER, uploaded_filename)
-        print(f"Saving image {path}")
+        # print(f"Saving image {path}")
         file.save(path)
         try:
             imageConverted = ImgToSus(root=app.root_path)
@@ -51,7 +51,7 @@ def upload():
 @app.route("/download/<path:filename>")
 def download(filename):
     folder = os.path.join(app.root_path, UPLOAD_FOLDER)
-    print(folder + filename)
+    # print(folder + filename)
     return send_from_directory(folder, filename)
 
 def get_correct_filename(filename: str):

@@ -7,12 +7,12 @@
     </form>
     {% if uploaded %}
         <div>
-            <img src="{{ url_for('download', filename=uploaded) }}" width="400" height="400" >
+            <img src="{{ url_for('download', filename=uploaded) }}" width="600" height="600" >
         </div>
     {% endif %}
     {% if converted %} 
         <div>
-            <img src="{{ url_for('download', filename=converted) }}" width="400" height="400">
+            <img src="{{ url_for('download', filename=converted) }}" width="600" height="600">
         </div>
     {% endif %}
 {% endblock %}
