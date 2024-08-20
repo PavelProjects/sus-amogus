@@ -37,7 +37,7 @@ def upload():
         print(f"Saving image {path}")
         file.save(path)
         try:
-            imageConverted = ImgToSus(scale=5, root=app.root_path)
+            imageConverted = ImgToSus(root=app.root_path)
             imageConverted.load_img(path)
             converted_filename = imageConverted.convert_img()
             return redirect(f"/?converted={converted_filename}&uploaded={uploaded_filename}")
